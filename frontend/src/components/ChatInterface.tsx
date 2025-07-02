@@ -31,6 +31,12 @@ const ChatTitle = styled.h1`
   gap: 0.75rem;
 `;
 
+const LogoImage = styled.img`
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+`;
+
 const ChatMessages = styled.div`
   flex: 1;
   background: rgba(255, 255, 255, 0.95);
@@ -270,8 +276,26 @@ const ChatInterface: React.FC = () => {
             );
           }
 
-          // Check for timeline/date patterns
-          if (trimmed.match(/\b(20\d{2}|January|February|March|April|May|June|July|August|September|October|November|December|Ramadan|Eid)\b/i)) {
+          // Check for table format (lines with multiple pipe separators)
+          if (trimmed.includes('|') && trimmed.split('|').length >= 3) {
+            // This looks like a table row, render as preformatted text
+            return (
+              <div key={index} className="table-row" style={{
+                fontFamily: 'monospace',
+                fontSize: '0.9em',
+                backgroundColor: '#f8f9fa',
+                padding: '0.5rem',
+                borderRadius: '4px',
+                marginBottom: '0.5rem',
+                overflowX: 'auto'
+              }}>
+                {trimmed}
+              </div>
+            );
+          }
+
+          // Check for timeline/date patterns (but exclude table-like content)
+          if (trimmed.match(/\b(20\d{2}|January|February|March|April|May|June|July|August|September|October|November|December|Ramadan|Eid)\b/i) && !trimmed.includes('|')) {
             return (
               <div key={index} className="timeline-item">
                 <div className="timeline-date">
@@ -295,10 +319,15 @@ const ChatInterface: React.FC = () => {
 
           // Check for headings (sentences ending with colon or starting with key phrases)
           if (trimmed.endsWith(':') || trimmed.match(/^(The latest|Recent|Current|Notable|Key|Important|Welcome)/i)) {
+            // For numbered headings, remove both the period after the number and the colon
+            let headingText = trimmed.replace(':', '');
+            if (headingText.match(/^\d+\.\s/)) {
+              headingText = headingText.replace(/^(\d+)\.\s/, '$1 ');
+            }
             return (
               <h3 key={index}>
                 <TrendingUp size={16} />
-                {trimmed.replace(':', '')}
+                {headingText}
               </h3>
             );
           }
@@ -384,8 +413,9 @@ const ChatInterface: React.FC = () => {
     <ChatContainer>
       <ChatHeader>
         <ChatTitle>
+          <LogoImage src="/dubai-police-logo.svg" alt="Dubai Police Logo" />
           <Bot size={24} />
-          AI Crime Research Assistant
+          Dubai Police AI Crime Research Assistant
         </ChatTitle>
       </ChatHeader>
 

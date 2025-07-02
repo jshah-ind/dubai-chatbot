@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import { Shield, MessageCircle, Search, BarChart3 } from 'lucide-react';
+import { MessageCircle, Search, BarChart3 } from 'lucide-react';
 
 const HeaderContainer = styled.header`
   position: fixed;
@@ -30,10 +30,10 @@ const Logo = styled.div`
   text-decoration: none;
 `;
 
-const LogoIcon = styled(Shield)`
-  width: 32px;
-  height: 32px;
-  color: #4299e1;
+const LogoImage = styled.img`
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
 `;
 
 const Nav = styled.nav`
@@ -74,7 +74,7 @@ const Header: React.FC = () => {
   return (
     <HeaderContainer>
       <Logo as={Link} to="/">
-        <LogoIcon />
+        <LogoImage src="/dubai-police-logo.svg" alt="Dubai Police Logo" />
         Dubai Police Crime Research
       </Logo>
       

@@ -16,6 +16,13 @@ const Hero = styled.section`
   color: white;
 `;
 
+const HeroLogo = styled.img`
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+`;
+
 const Title = styled.h1`
   font-size: 3rem;
   font-weight: 700;
@@ -149,6 +156,7 @@ const Dashboard: React.FC = () => {
   return (
     <DashboardContainer>
       <Hero>
+        <HeroLogo src="/dubai-police-logo.svg" alt="Dubai Police Logo" />
         <Title>Dubai Police Crime Research Platform</Title>
         <Subtitle>
           Advanced AI-powered crime analysis and research tools for law enforcement professionals.

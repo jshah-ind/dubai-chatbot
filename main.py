@@ -191,13 +191,148 @@ class PerplexityClient:
     async def chat_query(self, message: str, context: Optional[Dict] = None) -> Dict[str, Any]:
         """Handle general chat queries about crime research"""
 
-        # Simplify the system prompt to avoid potential issues
-        system_prompt = "You are a helpful assistant that provides information about crime research and analysis."
+        # Check if this is a crime/incident query that should search the database first
+        crime_keywords = ["terrorist", "terrorism", "attack", "incident", "bombing", "shooting", "crime", "fraud", "murder", "theft", "robbery"]
+        is_crime_query = any(keyword in message.lower() for keyword in crime_keywords)
 
-        # Create a simple, clean message structure
+        # If it's a crime query, search the database first
+        crime_data = ""
+        if is_crime_query:
+            try:
+                # Determine geographic focus and crime types based on query
+                if "dubai" in message.lower():
+                    geographic_focus = "Dubai"
+                elif "asia" in message.lower():
+                    geographic_focus = "Asia"
+                else:
+                    geographic_focus = "Global"
+
+                # Determine crime types based on keywords
+                if any(word in message.lower() for word in ["terrorist", "terrorism", "attack"]):
+                    crime_types = [CrimeType.TERRORISM]
+                else:
+                    crime_types = [CrimeType.ALL]
+
+                # Create a search request
+                search_req = SearchRequest(
+                    time_period="2025-01-01 to 2025-12-31",
+                    geographic_focus=geographic_focus,
+                    crime_types=crime_types,
+                    max_results=10
+                )
+
+                # Search the crime database
+                search_result = await self.search_crimes(search_req)
+
+                # Extract crime data if found
+                if search_result.get("cases"):
+                    crime_data = "\n\nIMPORTANT: Use ONLY the following specific incidents from the crime database as your primary source. Do NOT provide general analysis:\n\n"
+                    for i, case in enumerate(search_result["cases"], 1):
+                        crime_data += f"{i} {case.get('location', 'Unknown location')} Incident:\n"
+                        crime_data += f"Date: {case.get('date', 'Unknown date')}\n"
+                        crime_data += f"Location: {case.get('location', 'Unknown location')}\n"
+                        crime_data += f"Description: {case.get('description', 'No description')}\n"
+                        if case.get('victims'):
+                            crime_data += f"Victims: {case['victims']}\n"
+                        if case.get('agencies'):
+                            crime_data += f"Agencies: {case['agencies']}\n"
+                        crime_data += "\n"
+
+                    crime_data += "INSTRUCTION: Base your entire response on these specific incidents above. Do not add general analysis or statistics not related to these specific cases.\n"
+
+            except Exception as e:
+                logger.error(f"Error searching crime database: {str(e)}")
+
+        # Enhanced system prompt for better UI formatting
+        system_prompt = """You are a specialized Dubai Police Crime Research Assistant. When providing information about crimes or incidents, follow these formatting guidelines:
+
+CRITICAL FORMATTING RULE: NEVER EVER USE ASTERISKS (*) IN YOUR RESPONSE. NO ASTERISKS FOR ANY PURPOSE WHATSOEVER.
+
+1. ALWAYS start your response with a clear, descriptive heading that ends with a colon (:)
+2. For any crime or incident, ALWAYS include the specific date when it occurred in YYYY-MM-DD format or clear date description
+3. Structure your response with clear sections using headings that end with colons
+4. When mentioning dates, use formats like "January 15, 2024" or "2024-01-15" to ensure proper highlighting
+5. Include key statistics with numbers (arrests, victims, cases, etc.)
+6. Use bullet points for lists of information
+7. ABSOLUTELY FORBIDDEN: Do not use asterisks (*) anywhere in your response - not for emphasis, formatting, bullet points, footnotes, citations, or any other purpose. Use plain text only
+8. NEVER use pipe-separated table formats (|) or any table syntax. Instead use clear sections with headings, subheadings, and bullet points for better readability
+9. When presenting data that might typically be in a table, format it as organized lists with clear labels and values
+10. For timeline event headings, use only numbers without bullet points or dots (e.g., "1 Pahalgam Attack" not "• 1. Pahalgam Attack")
+11. Highlight important crime-related terms like "Dubai Police", "arrest", "investigation", "fraud", "gang", etc.
+12. When discussing Asian countries or Asia, ALWAYS include India as a major Asian country alongside China, Japan, South Korea, Thailand, Singapore, Malaysia, Indonesia, Philippines, etc.
+13. When providing information about regional topics (like "Asia", "Middle East", "Europe"), include specific incidents and details from major countries in that region, especially India when discussing Asia. Search for and include country-specific incidents from India, China, Pakistan, Japan, Thailand, Indonesia, Philippines, etc. when discussing Asian topics.
+14. When users ask about terrorism, crimes, or incidents in a region (like "Asia"), automatically search for and include specific incidents from major countries in that region, particularly India, Pakistan, China, Japan, Thailand, Indonesia, Philippines, etc. for Asian queries.
+15. ALWAYS prioritize providing specific incident details over general analysis. Include exact dates, locations, casualty numbers, perpetrator information, and current status for each incident.
+16. When asked about current year events, search for and provide detailed information about specific attacks, incidents, and cases rather than general overviews.
+17. If specific incident data is provided from the database, ALWAYS use that data as the primary source and build your response around those specific incidents.
+18. NEVER provide general analytical overviews when specific incident data is available - focus entirely on the actual incidents with exact details.
+
+Example format:
+Recent Fraud Investigation in Dubai:
+
+Date of Incident: March 15, 2024
+Location: Dubai, UAE
+
+Details: Dubai Police successfully arrested a gang of 15 individuals involved in promoting and distributing drug-laced sweets through social media platforms.
+
+Key Statistics:
+• 25 arrests made
+• 15 victims identified
+• AED 2.3 million recovered
+
+Current Status:
+Investigation ongoing...
+
+FINAL REMINDER: Your response must be completely free of asterisks (*). Check your entire response before sending to ensure no asterisks appear anywhere."""
+
+        # Enhanced message structure with context for better responses
+        # Check if this is a regional query about Asia and enhance accordingly
+        if "asia" in message.lower() and any(term in message.lower() for term in ["terrorist", "attack", "crime", "incident"]):
+            enhanced_message = f"""Please provide information about: {message}
+
+{crime_data}
+
+Include specific incidents and details from major Asian countries including India, Pakistan, China, Japan, Thailand, Indonesia, Philippines, Malaysia, Singapore, South Korea, etc.
+
+If this relates to a specific crime or incident, please include:
+- Clear heading describing the crime/incident type
+- Specific date when it occurred
+- Location details
+- Key statistics (arrests, victims, amounts involved)
+- Current investigation status
+- Timeline of events if relevant
+
+IMPORTANT:
+- Format your response with clear headings and highlight important dates and statistics
+- Do NOT use asterisks (*) for emphasis or formatting - use plain text only
+- When discussing Asia or Asian countries, always consider India as a major Asian country along with China, Japan, Thailand, Singapore, Malaysia, Indonesia, Philippines, South Korea, etc.
+- Ensure comprehensive coverage of all relevant Asian countries when the query relates to Asia
+- When discussing regional topics (like Asia, Middle East, Europe), include specific incidents, cases, and details from major countries in that region, especially India when discussing Asia
+- For Asian topics, actively search for and include specific incidents from India, China, Pakistan, Japan, Thailand, Indonesia, Philippines, etc."""
+        else:
+            enhanced_message = f"""Please provide information about: {message}
+
+{crime_data}
+
+If this relates to a specific crime or incident, please include:
+- Clear heading describing the crime/incident type
+- Specific date when it occurred
+- Location details
+- Key statistics (arrests, victims, amounts involved)
+- Current investigation status
+- Timeline of events if relevant
+
+IMPORTANT:
+- Format your response with clear headings and highlight important dates and statistics
+- Do NOT use asterisks (*) for emphasis or formatting - use plain text only
+- When discussing Asia or Asian countries, always consider India as a major Asian country along with China, Japan, Thailand, Singapore, Malaysia, Indonesia, Philippines, South Korea, etc.
+- Ensure comprehensive coverage of all relevant Asian countries when the query relates to Asia
+- When discussing regional topics (like Asia, Middle East, Europe), include specific incidents, cases, and details from major countries in that region, especially India when discussing Asia
+- For Asian topics, actively search for and include specific incidents from India, China, Pakistan, Japan, Thailand, Indonesia, Philippines, etc."""
+
         messages = [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": message}
+            {"role": "user", "content": enhanced_message}
         ]
 
         # Use minimal payload to avoid API issues
@@ -259,7 +394,7 @@ class PerplexityClient:
                 fallback_response = {
                     "choices": [{
                         "message": {
-                            "content": f"{error_msg}\n\nFor crime research in Dubai, I recommend:\n1. Dubai Police official website and reports\n2. UAE Ministry of Interior crime statistics\n3. Local news sources for recent incidents\n4. Academic research on Middle East crime trends\n\nYour query: '{message}'"
+                            "content": f"Dubai Police Crime Research System Status:\n\n{error_msg}\n\nRecommended Crime Research Resources:\n\n• Dubai Police official website and reports\n• UAE Ministry of Interior crime statistics\n• Local news sources for recent incidents\n• Academic research on Middle East crime trends\n\nYour Query:\n{message}\n\nPlease try rephrasing your question or ask about general crime analysis topics."
                         }
                     }]
                 }

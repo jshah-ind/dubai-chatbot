@@ -34,6 +34,12 @@ const SearchTitle = styled.h2`
   gap: 0.75rem;
 `;
 
+const LogoImage = styled.img`
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+`;
+
 const FormGroup = styled.div`
   margin-bottom: 1.5rem;
 `;
@@ -365,8 +371,9 @@ const SearchInterface: React.FC = () => {
     <SearchContainer>
       <SearchPanel>
         <SearchTitle>
+          <LogoImage src="/dubai-police-logo.svg" alt="Dubai Police Logo" />
           <Filter size={24} />
-          Search Filters
+          Crime Search
         </SearchTitle>
 
         <FormGroup>

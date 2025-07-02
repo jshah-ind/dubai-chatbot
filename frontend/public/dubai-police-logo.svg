@@ -1,0 +1,67 @@
+<svg width="200" height="240" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="200" height="240" fill="white"/>
+
+  <!-- Outer Laurel Wreath Circle -->
+  <circle cx="100" cy="100" r="80" fill="none" stroke="#000000" stroke-width="6"/>
+
+  <!-- Left Laurel Branch -->
+  <g fill="#000000">
+    <!-- Left side detailed laurel leaves -->
+    <path d="M25 100 Q20 90 25 80 Q30 85 25 95 Q20 105 25 115 Q30 110 25 100"/>
+    <path d="M30 85 Q25 75 30 65 Q35 70 30 80 Q25 90 30 100 Q35 95 30 85"/>
+    <path d="M30 115 Q25 125 30 135 Q35 130 30 120 Q25 110 30 100 Q35 105 30 115"/>
+    <path d="M35 70 Q30 60 35 50 Q40 55 35 65 Q30 75 35 85 Q40 80 35 70"/>
+    <path d="M35 130 Q30 140 35 150 Q40 145 35 135 Q30 125 35 115 Q40 120 35 130"/>
+
+    <!-- Additional left leaves -->
+    <ellipse cx="40" cy="75" rx="4" ry="10" transform="rotate(-30 40 75)"/>
+    <ellipse cx="40" cy="125" rx="4" ry="10" transform="rotate(30 40 125)"/>
+    <ellipse cx="45" cy="85" rx="3" ry="8" transform="rotate(-45 45 85)"/>
+    <ellipse cx="45" cy="115" rx="3" ry="8" transform="rotate(45 45 115)"/>
+  </g>
+
+  <!-- Right Laurel Branch -->
+  <g fill="#000000">
+    <!-- Right side detailed laurel leaves -->
+    <path d="M175 100 Q180 90 175 80 Q170 85 175 95 Q180 105 175 115 Q170 110 175 100"/>
+    <path d="M170 85 Q175 75 170 65 Q165 70 170 80 Q175 90 170 100 Q165 95 170 85"/>
+    <path d="M170 115 Q175 125 170 135 Q165 130 170 120 Q175 110 170 100 Q165 105 170 115"/>
+    <path d="M165 70 Q170 60 165 50 Q160 55 165 65 Q170 75 165 85 Q160 80 165 70"/>
+    <path d="M165 130 Q170 140 165 150 Q160 145 165 135 Q170 125 165 115 Q160 120 165 130"/>
+
+    <!-- Additional right leaves -->
+    <ellipse cx="160" cy="75" rx="4" ry="10" transform="rotate(30 160 75)"/>
+    <ellipse cx="160" cy="125" rx="4" ry="10" transform="rotate(-30 160 125)"/>
+    <ellipse cx="155" cy="85" rx="3" ry="8" transform="rotate(45 155 85)"/>
+    <ellipse cx="155" cy="115" rx="3" ry="8" transform="rotate(-45 155 115)"/>
+  </g>
+
+  <!-- Central Shield -->
+  <path d="M100 30 L70 45 L70 90 Q70 115 100 130 Q130 115 130 90 L130 45 Z" fill="#000000"/>
+
+  <!-- Inner white circle -->
+  <circle cx="100" cy="80" r="22" fill="white"/>
+
+  <!-- Central sailing ship/dhow -->
+  <g fill="#000000">
+    <!-- Ship hull -->
+    <path d="M85 85 Q100 90 115 85 Q110 95 100 95 Q90 95 85 85"/>
+    <!-- Main mast -->
+    <line x1="100" y1="60" x2="100" y2="95" stroke="#000000" stroke-width="2"/>
+    <!-- Main sail -->
+    <path d="M100 60 Q85 65 85 80 Q100 75 100 60" fill="#000000"/>
+    <!-- Front sail -->
+    <path d="M100 60 Q110 65 110 75 Q100 70 100 60" fill="#000000"/>
+    <!-- Flag -->
+    <path d="M100 60 L105 55 L105 65 Z" fill="#000000"/>
+  </g>
+
+  <!-- Bottom text area -->
+  <g fill="#000000" font-family="Arial, sans-serif" font-weight="bold">
+    <!-- Arabic text -->
+    <text x="100" y="180" text-anchor="middle" font-size="16">شرطة دبي</text>
+    <!-- English text -->
+    <text x="100" y="200" text-anchor="middle" font-size="12">DUBAI POLICE</text>
+  </g>
+</svg>
